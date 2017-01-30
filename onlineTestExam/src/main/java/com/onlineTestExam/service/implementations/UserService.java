@@ -16,19 +16,28 @@ public class UserService implements IUserService {
 	private IUserRepository repo;
 
 	@Override
-	public String login(String username, String password) {
+	public String login(User user) {
 
+		if(user == null){
+			
+			throw new IllegalArgumentException("User must not be null");
+		}
+		
 		String message = null;
 
-		if (isEmpty(username) || isEmpty(password)) {
+		String username = user.getUsername();
+		
+		String password = user.getPassword();
+		
+		if (isEmpty(username ) || isEmpty(password)) {
 
 			message = "Please, provide both username and password.";
 
 		} else {
 
-			User user = repo.findByUsernameAndPassword(username, password);
+			User registeredUser = repo.findByUsernameAndPassword(username, password);
 
-			if (user == null) {
+			if (registeredUser == null) {
 
 				message = "Invalid username or password.";
 			}

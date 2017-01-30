@@ -1,7 +1,8 @@
 package com.onlineTestExam.service.interfaces;
 
+import com.onlineTestExam.domain.User;
+
 public interface IUserService {
 
-	String login(String username, String password);
-
+	String login(User user);
 }

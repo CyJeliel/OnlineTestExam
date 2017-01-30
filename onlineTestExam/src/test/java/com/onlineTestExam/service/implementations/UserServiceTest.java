@@ -13,12 +13,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.onlineTestExam.domain.User;
 import com.onlineTestExam.repository.interfaces.IUserRepository;
 import com.onlineTestExam.service.implementations.UserService;
+import com.onlineTestExam.service.interfaces.IUserService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
 
 	@InjectMocks
-	private UserService app;
+	private IUserService app = new UserService();
 
 	@Mock
 	private IUserRepository repo;
@@ -29,18 +30,16 @@ public class UserServiceTest {
 		MockitoAnnotations.initMocks(this);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldThrowExceptionWhenUserNull() {
+	
+		app.login(null);
+	}
+	
 	@Test
 	public void loginWithNullFieldsShouldGiveAnErrorMessage() {
 
-		String errorMessage = app.login(null, null);
-
-		Assert.assertNotNull(errorMessage);
-
-		Assert.assertNotEquals("", errorMessage);
-
-		Assert.assertEquals("Please, provide both username and password.", errorMessage);
-
-		errorMessage = app.login("", "");
+		String errorMessage = app.login(new User());
 
 		Assert.assertNotNull(errorMessage);
 
@@ -52,13 +51,19 @@ public class UserServiceTest {
 	@Test
 	public void loginWithWrongFieldsShouldNotGiveAnErrorMessage() {
 		
+		User user = new User();
+		
 		String username = "username";
+		
+		user.setUsername(username);
 		
 		String password = "password";
 		
+		user.setPassword(password);
+		
 		Mockito.when(repo.findByUsernameAndPassword(username, password)).thenReturn(null);
 		
-		String errorMessage = app.login(username, password);
+		String errorMessage = app.login(user);
 		
 		Mockito.verify(repo).findByUsernameAndPassword(username, password);
 		
@@ -69,14 +74,20 @@ public class UserServiceTest {
 
 	@Test
 	public void loginWithProvidedFieldsShouldNotGiveAnErrorMessage() {
-
+		
+		User user = new User();
+		
 		String username = "username";
-
+		
+		user.setUsername(username);
+		
 		String password = "password";
+		
+		user.setPassword(password);
 		
 		Mockito.when(repo.findByUsernameAndPassword(username, password)).thenReturn(new User());
 
-		String errorMessage = app.login(username, password);
+		String errorMessage = app.login(user);
 		
 		Assert.assertNull(errorMessage);
 	}
